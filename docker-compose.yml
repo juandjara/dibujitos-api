@@ -1,0 +1,27 @@
+version: '3'
+services:
+  node:
+    build: .
+    command: npm start
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    networks:
+      - redis-net
+    depends_on:
+      - redis
+  redis:
+    image: "redis:alpine"
+    command: ["redis-server", "--appendonly", "yes"]
+    hostname: redis
+    networks: 
+      - redis-net
+    volumes:
+      - redis-data:/data
+
+networks: 
+  redis-net:
+
+volumes:
+  redis-data:
