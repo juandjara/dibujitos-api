@@ -5,7 +5,7 @@ const helmet = require('helmet')
 const logger = require('morgan')
 const pkg = require('./package.json')
 const {si} = require('nyaapi')
-const {parseTorrent, groupBy} = require('./utils')
+const {parseTorrent, groupBy, fetchMetadata} = require('./utils')
 
 const app = express()
 
@@ -44,7 +44,18 @@ app.get('/latest', (req, res, next) => {
       item => item.showTitle + item.episodeNumber
     );
     const flattened = Object.keys(grouped).map(key => grouped[key][0])
-    res.json(flattened);
+    const promises = flattened.map(torrent => (
+      fetchMetadata(torrent.slug).then(metadata => ({
+        metadata: {
+          ...metadata,
+          slug: undefined
+        },
+        torrentInfo: torrent,
+      }))
+    ))
+    return Promise.all(promises).then(withMetadata => {
+      res.json(withMetadata);
+    })
   }).catch(next);
 })
 

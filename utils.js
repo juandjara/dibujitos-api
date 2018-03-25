@@ -1,4 +1,34 @@
 const slug = require('slug')
+const {promisify} = require('util')
+const kitsu = require('node-kitsu')
+const redis = require('redis')
+const cacheDB = redis.createClient(
+  process.env.REDIS_PORT,
+  process.env.REDIS_HOST
+)
+cacheDB.on('error', (err) => {
+  console.error(err);
+})
+const cacheGet = promisify(cacheDB.get).bind(cacheDB)
+const cacheSet = promisify(cacheDB.setex).bind(cacheDB)
+const CACHE_EXPIRE_TIME = 60 * 60 * 24 * 2; // 2 days
+
+async function fetchMetadata(slug) {
+  const cached = await cacheGet(slug);
+  if(cached) {
+    return JSON.parse(cached);
+  }
+  const response = await kitsu.searchAnime(slug, 0);
+  if(!response.length) {
+    return Promise.reject(`Anime not found for slug ${slug}`)
+  }
+  const data = {
+    ...response[0].attributes,
+    id: response[0].id
+  }
+  await cacheSet(slug, CACHE_EXPIRE_TIME, JSON.stringify(data));
+  return data;
+}
 
 function parseTorrent(torrent) {
   const parts = getNameParts(torrent.name);
@@ -58,6 +88,7 @@ function groupBy(array, predicate) {
   }, {})
 }
 
+exports.groupBy = groupBy;
 exports.parseTorrent = parseTorrent;
 exports.getNameParts = getNameParts;
-exports.groupBy = groupBy;
+exports.fetchMetadata = fetchMetadata;
