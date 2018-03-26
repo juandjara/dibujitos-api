@@ -5,7 +5,7 @@ const helmet = require('helmet')
 const logger = require('morgan')
 const pkg = require('./package.json')
 const {si} = require('nyaapi')
-const {parseTorrent, groupBy, fetchMetadata} = require('./utils')
+const {parseTorrentGroup, groupBy, fetchMetadata} = require('./utils')
 
 const app = express()
 
@@ -22,25 +22,23 @@ app.get('/', (req, res) => {
   })
 })
 
+const sourceMap = {
+  hs: 'HorribleSubs',
+  py: 'puyero'
+}
+
 app.get('/latest', (req, res, next) => {
-  const sourceMap = {
-    hs: 'HorribleSubs',
-    py: 'puyero'
-  }
+  // page is added 1 to get 0-based paging
+  // rpp is multipled by 3 because results will be grouped
   si.searchByUserAndByPage({
     user: sourceMap[req.query.source || 'hs'],
-    term: '',
-    p: req.query.page || 1,
-    n: req.query.rpp || 60,
+    term: req.query.q,
+    p: (req.query.page || 0) + 1,
+    n: (req.query.rpp || 20) * 3,
     filter: 2
   }).then(data => {
     const grouped = groupBy(
-      data.map(parseTorrent)
-        .filter(t => !t.isBatch)
-        .map(t => {
-          delete t.isBatch;
-          return t;
-        }),
+      parseTorrentGroup(data),
       item => item.showTitle + item.episodeNumber
     );
     const flattened = Object.keys(grouped).map(key => grouped[key][0])
@@ -59,6 +57,19 @@ app.get('/latest', (req, res, next) => {
   }).catch(next);
 })
 
+app.get('/show/:slug', (req, res, next) => {
+  const showName = req.params.slug.replace(/-/g, '');
+  si.searchByUserAndByPage({
+    user: sourceMap[req.query.source || 'hs'],
+    term: showName,
+    p: (req.query.page || 0) + 1,
+    n: (req.query.rpp || 20) * 3,
+    filter: 2
+  })
+})
+
+// global error handler
+// is reached when some previous handler function calls next with an error
 app.use((err, req, res, next) => {
   if (process.env.ENV === 'dev') {
     console.error(err)

@@ -48,6 +48,15 @@ function parseTorrent(torrent) {
   }
 }
 
+function parseTorrentGroup(group) {
+  return group.map(parseTorrent)
+  .filter(t => !t.isBatch)
+  .map(t => {
+    delete t.isBatch;
+    return t;
+  })
+}
+
 function getNameParts(name) {
   const parts = name.replace(/]/g, "[")
     .split("[")
@@ -90,5 +99,6 @@ function groupBy(array, predicate) {
 
 exports.groupBy = groupBy;
 exports.parseTorrent = parseTorrent;
+exports.parseTorrentGroup = parseTorrentGroup;
 exports.getNameParts = getNameParts;
 exports.fetchMetadata = fetchMetadata;
