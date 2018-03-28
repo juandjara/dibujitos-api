@@ -13,10 +13,27 @@ const cacheGet = promisify(cacheDB.get).bind(cacheDB)
 const cacheSet = promisify(cacheDB.setex).bind(cacheDB)
 const CACHE_EXPIRE_TIME = 60 * 60 * 24 * 2; // 2 days
 
+function filterMetadata(meta) {
+  return {
+    canonicalTitle: meta.canonicalTitle,
+    titles: meta.titles,
+    abbreviatedTitles: meta.abbreviatedTitles,
+    description: meta.description,
+    startDate: meta.startDate,
+    endDate: meta.endDate,
+    status: meta.status,
+    posterImage: meta.posterImage,
+    coverImage: meta.coverImage,
+    episodeCount: meta.episodeCount,
+    episodeLength: meta.episodeLength,
+    youtubeVideoId: meta.youtubeVideoId
+  };
+}
+
 async function fetchMetadata(slug) {
   const cached = await cacheGet(slug);
   if(cached) {
-    return JSON.parse(cached);
+    return filterMetadata(JSON.parse(cached));
   }
   const response = await kitsu.searchAnime(slug, 0);
   if(!response.length) {
@@ -27,7 +44,7 @@ async function fetchMetadata(slug) {
     id: response[0].id
   }
   await cacheSet(slug, CACHE_EXPIRE_TIME, JSON.stringify(data));
-  return data;
+  return filterMetadata(data);
 }
 
 function parseTorrent(torrent) {
@@ -35,8 +52,8 @@ function parseTorrent(torrent) {
   return {
     fileSize: torrent.fileSize,
     timestamp: parseInt(torrent.timestamp),
-    seeders: parseInt(torrent.seeders),
-    leechers: parseInt(torrent.leechers),
+    seeds: parseInt(torrent.seeders),
+    peers: parseInt(torrent.leechers),
     numDownloads: parseInt(torrent.nbDownload),
     link: torrent.links.magnet,
     showTitle: parts.showTitle,
