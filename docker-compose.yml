@@ -4,13 +4,14 @@ services:
     build: .
     command: npm start
     ports:
-      - "5000:5000"
+      - "5555:5000"
     env_file:
       - .env.prod
     networks:
       - redis-net
     depends_on:
       - redis
+    restart: always
   redis:
     image: "redis:alpine"
     command: ["redis-server", "--appendonly", "yes"]
