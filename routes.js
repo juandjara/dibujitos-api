@@ -1,9 +1,11 @@
 const {si} = require('nyaapi')
 const {parseTorrentGroup, groupBy, fetchMetadata} = require('./utils')
+const HSCalendar = require('hs-calendar');
 const sourceMap = {
   hs: 'HorribleSubs',
   py: 'puyero'
 }
+const cal = new HSCalendar();
 
 const asyncWrapper = fn =>
   (req, res, next) => {
@@ -85,6 +87,18 @@ async function show(req, res) {
   })
 }
 
+const calendar = (req, res, next) => {
+  cal.getWeekWithTime()
+  .then(data => {
+    if (!data) {
+      const error = new Error('Error fetching HS Calendar');
+      next(error);
+      return;
+    }
+    res.json(data);
+  })
+}
+
 // global error handler
 // is reached when some previous handler function calls next with an error
 const errorHandler = (err, req, res, next) => {
@@ -101,4 +115,5 @@ const errorHandler = (err, req, res, next) => {
 
 exports.latest = asyncWrapper(latest);
 exports.show = asyncWrapper(show);
+exports.calendar = calendar;
 exports.errorHandler = errorHandler;
