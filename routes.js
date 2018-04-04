@@ -108,9 +108,8 @@ const errorHandler = (err, req, res, next) => {
     console.error(err.message)
     err.message = "Internal server error"
   }
-  let status = err.status || 500
-  res.status(status)
-     .json({name: err.name, status, error: err.message});
+  err.status = err.status || 500
+  res.status(err.status).json(err);
 }
 
 exports.latest = asyncWrapper(latest);

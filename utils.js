@@ -49,6 +49,9 @@ async function fetchMetadata(slug) {
 
 function parseTorrent(torrent) {
   const parts = getNameParts(torrent.name);
+  if(!parts.episodeNumber && !parts.isBatch) {
+    console.warn(`Found torrent with no epNumber \n TORRENT: \n`, torrent, '\n PARTS: \n', parts)
+  }
   return {
     fileSize: torrent.fileSize,
     timestamp: parseInt(torrent.timestamp),
@@ -81,18 +84,17 @@ function getNameParts(name) {
     .map(s => s.trim())
   const user = parts[0];
   const title = parts[1];
-  const quality = parts[2];
-  const isBatch = parts.some(
-    part => part === '(Batch)' || part === 'Batch'
-  );
-  let showTitle = '';
+  const qualityMatch = name.match(/\d{1,4}p/)
+  const quality = qualityMatch && qualityMatch[0];
+  const isBatch = !!name.match(/([Bb]atch)|([\(\[]\d+-\d+[\)\]])/)
+  let showTitle = title;
   let episodeNumber = '';
-  if(isBatch) {
-    showTitle = title.replace(/ \(.*/, ""); 
-  } else {
+  if(!isBatch) {
     const episodeIndex = title.lastIndexOf(' - ');
-    showTitle = title.substr(0, episodeIndex)
-    episodeNumber = title.substr(episodeIndex + 3);
+    if(episodeIndex !== -1) {
+      showTitle = title.substr(0, episodeIndex)
+      episodeNumber = title.substr(episodeIndex + 3);
+    } 
   }
   return {
     user,
