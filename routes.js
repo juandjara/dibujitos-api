@@ -31,12 +31,11 @@ async function latest(req, res) {
     .map(key => grouped[key][0]);
   const promises = flattened.map(torrent => (
     fetchMetadata(torrent.slug).then(metadata => ({
-      ...metadata,
+      posterImage: metadata.posterImage,
       slug: torrent.slug,
       showTitle: torrent.showTitle,
       episodeNumber: torrent.episodeNumber,
-      episodeDate: torrent.timestamp * 1000,
-      episodeSize: torrent.fileSize
+      episodeDate: torrent.timestamp
     }))
   ))
   const withMetadata = await Promise.all(promises);
@@ -63,16 +62,19 @@ async function show(req, res) {
       prev[next.quality] = {
         magnet: next.link,
         peers: next.peers,
-        seeds: next.seeds
+        seeds: next.seeds,
+        fileSize: next.fileSize,
+        numDownloads: next.numDownloads
       };
       return prev;
     }, {})
     return {
-      ...group[0],
-      seeders: undefined,
-      leechers: undefined,
-      quality: undefined,
-      link: undefined,
+      slug: group[0].showTitle,
+      showTitle: group[0].showTitle,
+      fullTitle: group[0].fullTitle,
+      episodeNumber: group[0].episodeNumber,
+      timestamp: group[0].timestamp,
+      numDownloads: group.map(q => q.numDownloads).reduce((a,b) => a+b, 0),
       qualities
     }
   })

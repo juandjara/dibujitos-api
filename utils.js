@@ -14,11 +14,12 @@ const cacheSet = promisify(cacheDB.setex).bind(cacheDB)
 const CACHE_EXPIRE_TIME = 60 * 60 * 24 * 2; // 2 days
 
 function filterMetadata(meta) {
+  console.log("UNFILTERED META \n\n", meta);
   return {
     canonicalTitle: meta.canonicalTitle,
     titles: meta.titles,
     abbreviatedTitles: meta.abbreviatedTitles,
-    description: meta.description,
+    description: meta.synopsis,
     startDate: meta.startDate,
     endDate: meta.endDate,
     status: meta.status,
@@ -54,7 +55,7 @@ function parseTorrent(torrent) {
   }
   return {
     fileSize: torrent.fileSize,
-    timestamp: parseInt(torrent.timestamp),
+    timestamp: parseInt(torrent.timestamp) * 1000,
     seeds: parseInt(torrent.seeders),
     peers: parseInt(torrent.leechers),
     numDownloads: parseInt(torrent.nbDownload),
