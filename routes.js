@@ -35,7 +35,7 @@ async function latest(req, res) {
       slug: torrent.slug,
       showTitle: torrent.showTitle,
       episodeNumber: torrent.episodeNumber,
-      episodeDate: torrent.timestamp,
+      episodeDate: torrent.timestamp * 1000,
       episodeSize: torrent.fileSize
     }))
   ))
