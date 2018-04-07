@@ -33,6 +33,7 @@ async function latest(req, res) {
     fetchMetadata(torrent.slug).then(metadata => ({
       posterImage: metadata.posterImage,
       slug: torrent.slug,
+      fullTitle: torrent.fullTitle,
       showTitle: torrent.showTitle,
       episodeNumber: torrent.episodeNumber,
       episodeDate: torrent.timestamp
