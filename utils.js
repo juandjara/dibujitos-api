@@ -62,7 +62,7 @@ function parseTorrent(torrent) {
     link: torrent.links.magnet,
     showTitle: parts.showTitle,
     slug: slug(parts.showTitle).toLowerCase(),
-    episodeNumber: parts.episodeNumber,
+    episodeNumber: parseInt(parts.episodeNumber),
     quality: parts.quality,
     isBatch: parts.isBatch,
     fullTitle: torrent.name
