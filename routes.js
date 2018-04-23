@@ -49,8 +49,8 @@ async function show(req, res) {
   const episodes = await si.searchByUserAndByPage({
     user: sourceMap[req.query.source || 'hs'],
     term: showName,
-    p: (req.query.page || 0) + 1,
-    n: (req.query.rpp || 20) * 3,
+    p: +(req.query.page || 0) + 1,
+    n: +(req.query.rpp || 20) * 3,
     filter: 2
   });
   const groupedByEp = groupBy(
