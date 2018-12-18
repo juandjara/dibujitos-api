@@ -19,8 +19,8 @@ async function latest(req, res) {
   const data = await si.searchByUserAndByPage({
     user: sourceMap[req.query.source || 'hs'],
     term: req.query.q,
-    p: (req.query.page || 0) + 1,
-    n: (req.query.rpp || 20) * 3,
+    p: +(req.query.page || 0) + 1,
+    n: +(req.query.rpp || 25) * 3,
     filter: 2
   });
   const grouped = groupBy(
@@ -50,7 +50,7 @@ async function show(req, res) {
     user: sourceMap[req.query.source || 'hs'],
     term: showName,
     p: +(req.query.page || 0) + 1,
-    n: +(req.query.rpp || 20) * 3,
+    n: +(req.query.rpp || 25) * 3,
     filter: 2
   });
   const groupedByEp = groupBy(
