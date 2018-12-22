@@ -61,7 +61,7 @@ function parseTorrent(torrent) {
     numDownloads: parseInt(torrent.nbDownload),
     link: torrent.links.magnet,
     showTitle: parts.showTitle,
-    slug: slug(parts.showTitle, {lower: true, charmap: {'.': '.'}}),
+    slug: slug(parts.showTitle, {lower: true, remove: null}),
     episodeNumber: parseInt(parts.episodeNumber),
     quality: parts.quality,
     isBatch: parts.isBatch,
