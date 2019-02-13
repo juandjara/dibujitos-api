@@ -3,6 +3,11 @@ services:
   node:
     build: .
     command: npm start
+    labels:
+      - traefik.frontend.rule=Host:nyapi.fuken.xyz
+      - traefik.port=5000
+    networks:
+      - web
     ports:
       - "5555:5000"
     env_file:
@@ -13,11 +18,17 @@ services:
       - redis
     restart: always
   redis:
+    labels:
+      - traefik.enable=false
     image: "redis:alpine"
     command: ["redis-server", "--appendonly", "yes"]
     hostname: redis
     volumes:
       - redis-data:/data
+
+networks:
+  web:
+    external: true
 
 volumes:
   redis-data:
