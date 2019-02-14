@@ -1,8 +1,9 @@
-FROM node:9-alpine
+FROM node:10-alpine
 
 WORKDIR /usr/app
 
 COPY package.json .
-RUN apk add --no-cache git && npm install --production
+COPY package-lock.json .
+RUN apk add --no-cache git && npm ci
 
 COPY . .
