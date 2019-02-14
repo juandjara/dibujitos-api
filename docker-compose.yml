@@ -8,6 +8,7 @@ services:
       - traefik.port=5000
     networks:
       - web
+      - redis
     ports:
       - "5555:5000"
     env_file:
@@ -18,11 +19,12 @@ services:
       - redis
     restart: always
   redis:
+    networks:
+      - redis
     labels:
       - traefik.enable=false
     image: "redis:alpine"
     command: ["redis-server", "--appendonly", "yes"]
-    hostname: redis
     volumes:
       - redis-data:/data
 

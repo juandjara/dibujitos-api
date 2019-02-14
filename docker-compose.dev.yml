@@ -4,7 +4,7 @@ services:
     build: .
     command: npm start
     volumes:
-      - .:/usr/src/app
+      - ./:/usr/app
     ports:
       - "5000:5000"
     env_file:
