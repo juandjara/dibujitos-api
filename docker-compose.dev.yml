@@ -1,29 +1,27 @@
 version: '3'
 services:
-  node_dev:
+  node:
     build: .
-    command: npm start
+    command: npm run dev
     volumes:
       - ./:/usr/app
     ports:
-      - "5000:5000"
+      - 5000:5000
+      # node debugger port
+      - 9229::9229
     env_file:
       - .env
-    networks:
-      - redis-net
     depends_on:
       - redis
+    links:
+      - redis
   redis:
+    ports:
+      - 6379:6379
     image: "redis:alpine"
     command: ["redis-server", "--appendonly", "yes"]
-    hostname: redis
-    networks: 
-      - redis-net
     volumes:
       - redis-data:/data
-
-networks: 
-  redis-net:
 
 volumes:
   redis-data:

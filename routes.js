@@ -105,14 +105,17 @@ const calendar = (req, res, next) => {
 // global error handler
 // is reached when some previous handler function calls next with an error
 const errorHandler = (err, req, res, next) => {
+  if (typeof err === 'string') {
+    err = { message: err };
+  }
   if (process.env.ENV === 'dev') {
     console.error(err)
   } else {
     console.error(err.message)
     err.message = "Internal server error"
   }
-  err.status = err.status || 500
-  res.status(err.status).json(err);
+  const status = isNaN(err.status) ? 500 : err.status;
+  res.status(status).json(err);
 }
 
 exports.latest = asyncWrapper(latest);

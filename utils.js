@@ -14,7 +14,6 @@ const cacheSet = promisify(cacheDB.setex).bind(cacheDB)
 const CACHE_EXPIRE_TIME = 60 * 60 * 24 * 2; // 2 days
 
 function filterMetadata(meta) {
-  console.log("UNFILTERED META \n\n", meta);
   return {
     canonicalTitle: meta.canonicalTitle,
     titles: meta.titles,
@@ -38,7 +37,7 @@ async function fetchMetadata(slug) {
   }
   const response = await kitsu.searchAnime(slug, 0);
   if(!response.length) {
-    return Promise.reject(`Anime not found for slug ${slug}`)
+    return Promise.reject(new Error(`Anime not found for slug ${slug}`))
   }
   const data = {
     ...response[0].attributes,
