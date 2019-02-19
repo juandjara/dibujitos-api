@@ -83,6 +83,10 @@ async function show(req, res) {
   let meta = {}
   if (shouldAddMeta) {
     meta = await fetchMetadata(showName);
+    if (meta.notfound) {
+      res.status(404).json({error: `Anime not found for query term '${showName}'`});
+      return;
+    }
   }
   res.json({
     ...meta,
