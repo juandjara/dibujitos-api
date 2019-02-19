@@ -36,8 +36,9 @@ async function fetchMetadata(slug) {
     return filterMetadata(JSON.parse(cached));
   }
   const response = await kitsu.searchAnime(slug, 0);
-  if(!response.length) {
-    return Promise.reject(new Error(`[utils.fetchMetadata] ERROR: Anime not found for slug ${slug}`))
+  if (!response.length) {
+    console.error(`[utils.fetchMetadata] ERROR: Anime not found for slug ${slug}`);
+    return Promise.resolve({problematic: true});
   }
   const data = {
     ...response[0].attributes,
