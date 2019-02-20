@@ -4,7 +4,7 @@ const cors = require('cors')
 const helmet = require('helmet')
 const logger = require('morgan')
 const pkg = require('./package.json')
-const {latest, show, calendar, errorHandler} = require('./routes');
+const {rawsearch, latest, show, calendar, errorHandler} = require('./routes');
 
 const app = express()
 
@@ -21,7 +21,8 @@ app.get('/', (req, res) => {
     endpoints: [
       '/latest?source=&page=&rpp=&q=',
       '/show/:slug?source=&page=&rpp=&meta=',
-      '/calendar'
+      '/calendar',
+      '/rawsearch?q=&page='
     ]
   })
 })
@@ -29,6 +30,7 @@ app.get('/', (req, res) => {
 app.get('/latest', latest)
 app.get('/show/:slug', show)
 app.get('/calendar', calendar)
+app.get('/rawsearch', rawsearch)
 
 app.use(errorHandler);
 

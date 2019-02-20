@@ -106,6 +106,20 @@ const calendar = (req, res, next) => {
   })
 }
 
+async function rawsearch (req, res) {
+  const query = req.query.q;
+  const page  = +(req.query.page || 0) + 1
+  if (!query) {
+    res.status(400).json({error: '?q= parameter is missing'});
+    return;
+  }
+  const episodes = await si.searchPage({
+    term: query,
+    p: page
+  });
+  res.json(episodes);
+}
+
 // global error handler
 // is reached when some previous handler function calls next with an error
 const errorHandler = (err, req, res, next) => {
@@ -122,6 +136,7 @@ const errorHandler = (err, req, res, next) => {
   res.status(status).json(err);
 }
 
+exports.rawsearch = asyncWrapper(rawsearch);
 exports.latest = asyncWrapper(latest);
 exports.show = asyncWrapper(show);
 exports.calendar = calendar;
