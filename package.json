@@ -21,7 +21,7 @@
     "morgan": "^1.9.0",
     "node-kitsu": "^1.0.1",
     "nyaapi": "^2.0.5",
-    "redis": "^2.8.0",
+    "redis": "^3.1.1",
     "slug": "^0.9.1"
   },
   "devDependencies": {
